@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/distrischool/alunos")
+@RequestMapping("/api/alunos")
 public class AlunoController {
 
     @Autowired
@@ -28,24 +28,18 @@ public class AlunoController {
     public List<Aluno> searchAlunos(FiltroAlunoDTO filtro){
         return alunoService.getByFilter(filtro);
     }
+
     //Busca única - matrícula
     @GetMapping("/matricula/{matricula}")
     public ResponseEntity<Aluno> searchAlunobyMatricula(@PathVariable String matricula){
-        FiltroAlunoDTO filtro = new FiltroAlunoDTO();
-        filtro.setMatricula(matricula);
-
-        List<Aluno> resultado = alunoService.getByFilter(filtro);
-
-        if(resultado.size() == 1){
-            return ResponseEntity.ok(resultado.get(0));
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+        return alunoService.getByMatricula(matricula)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Aluno> searchAlunobyId(@PathVariable Long id){
-        return alunoService.getAlunoById(id)
+        return alunoService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -58,12 +52,9 @@ public class AlunoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Aluno> deleteAluno(@PathVariable Long id){
-        if(alunoService.delete(id)){
-            return ResponseEntity.ok().build();
-        }else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> deleteAluno(@PathVariable Long id){
+        alunoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

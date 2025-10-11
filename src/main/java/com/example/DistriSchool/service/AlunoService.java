@@ -2,75 +2,69 @@ package com.example.DistriSchool.service;
 
 import com.example.DistriSchool.domain.Aluno;
 import com.example.DistriSchool.dto.FiltroAlunoDTO;
+import com.example.DistriSchool.repository.AlunoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AlunoService {
 
-    private static List<Aluno> alunos =  new ArrayList<Aluno>();
-    private static Long proximoId = 1L;
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     public Aluno save(Aluno aluno) {
-        proximoId++;
-        aluno.setId(proximoId);
-        alunos.add(aluno);
-        return aluno;
+        return alunoRepository.save(aluno);
     }
 
     public List<Aluno> getAll() {
-        return alunos;
+        return alunoRepository.findAll();
+    }
+
+    public Optional<Aluno> getById(Long id) {
+        return alunoRepository.findById(id);
+    }
+
+    public Optional<Aluno> getByMatricula(String matricula) {
+        return alunoRepository.findByMatricula(matricula);
     }
 
     public List<Aluno> getByFilter(FiltroAlunoDTO filtro) {
-        return alunos.stream()
-                .filter(aluno -> filtro.getNome() == null || aluno.getNome().contains(filtro.getNome()))
-                .filter(aluno -> filtro.getTurma() == null || aluno.getTurma().equalsIgnoreCase(filtro.getTurma()))
-                .filter(aluno -> filtro.getMatricula() == null || aluno.getMatricula().equalsIgnoreCase(filtro.getMatricula()))
-                .collect(Collectors.toList());
-    }
-//    public List<Aluno> getByName(String name) {
-//        return alunos.stream()
-//                .filter(a -> a.getNome().contains(name))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public Optional<Aluno> getByMatricula(String matricula) {
-//        return alunos.stream()
-//                .filter(a -> a.getMatricula().equalsIgnoreCase(matricula))
-//                .findFirst();
-//    }
+        if (filtro.getNome() != null && !filtro.getNome().isEmpty()) {
+            return alunoRepository.findByNomeContainingIgnoreCase(filtro.getNome());
+        }
 
-    public List<Aluno> getByTurma(String turma) {
-        return alunos.stream()
-                .filter(a -> a.getTurma().equalsIgnoreCase(turma))
-                .collect(Collectors.toList());
+        if (filtro.getTurma() != null && !filtro.getTurma().isEmpty()) {
+            return alunoRepository.findByTurmaIgnoreCase(filtro.getTurma());
+        }
+
+        return alunoRepository.findAll();
     }
 
-    public Optional<Aluno> getAlunoById(Long id) {
-        return  alunos.stream()
-                .filter(a -> a.getId() == id)
-                .findFirst();
-    }
+    public Optional<Aluno> update(Long id, Aluno alunoInfo) {
+        Optional<Aluno> alunoOptional = alunoRepository.findById(id);
 
-    public Optional<Aluno> update(Long id, Aluno alunoInfo){
-        Optional<Aluno> alunoOptional = getAlunoById(id);
-
-        if(alunoOptional.isPresent()){
+        if (alunoOptional.isPresent()) {
             Aluno aluno = alunoOptional.get();
             aluno.setNome(alunoInfo.getNome());
             aluno.setMatricula(alunoInfo.getMatricula());
-//            aluno.setEmail(alunoInfo.getEmail()); preciso ver como alterar esta linha!
-            return Optional.of(aluno);
+            aluno.setDataNascimento(alunoInfo.getDataNascimento());
+            aluno.setTurma(alunoInfo.getTurma());
+            aluno.setEndereco(alunoInfo.getEndereco());
+            return Optional.of(alunoRepository.save(aluno));
         }
         return Optional.empty();
     }
 
-    public boolean delete(Long id) {
-       return alunos.removeIf( aluno -> aluno.getId() == id);
+    public void delete(Long id) {
+        if(!alunoRepository.existsById(id)){
+            throw new EmptyResultDataAccessException(
+                    String.format("Nenhum Aluno encontrado com o ID %d", id), 1
+            );
+        }
+        alunoRepository.deleteById(id);
     }
 }

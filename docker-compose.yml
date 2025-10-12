@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # 1. SERVIÇO DA API (AlunoService)
+  app:
+    build: .
+    container_name: distrischool-alunos-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/distrischool_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - db
+    networks:
+      - distrischool_network
+
+  # 2. SERVIÇO DO BANCO DE DADOS (PostgreSQL)
+  db:
+    image: postgres:14
+    container_name: postgres-db-alunos
+    environment:
+      POSTGRES_DB: distrischool_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - distrischool_network
+
+# Redes e Volumes
+volumes:
+  postgres_data: {}
+
+networks:
+  distrischool_network:
+    driver: bridge

@@ -79,4 +79,3 @@ O projeto utiliza um `GlobalExceptionHandler` (`@ControllerAdvice`) para lidar c
 
 ***
 
-Este `README` não só serve como um manual, mas também documenta a complexidade e a qualidade da sua implementação, destacando o uso do Docker Compose como o principal método de execução.

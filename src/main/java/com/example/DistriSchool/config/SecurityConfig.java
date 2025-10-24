@@ -43,11 +43,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.DELETE, "/api/alunos/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/alunos/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/alunos/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/alunos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/alunos/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/alunos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/alunos/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/alunos/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/alunos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/alunos").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults());

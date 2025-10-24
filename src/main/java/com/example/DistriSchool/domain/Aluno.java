@@ -40,8 +40,6 @@ public class Aluno {
     @NotBlank(message = "O nome é obrigatório.")
     private String nome;
 
-    @NotBlank(message = "A matrícula é obrigatória.")
-    @Size(min = 5, max = 50, message = "A matrícula deve ter entre 5 e 50 caracteres.")
     private String matricula;
 
     @NotBlank(message = "A turma é obrigatória.")

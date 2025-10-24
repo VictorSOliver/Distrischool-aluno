@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.Year;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class AlunoService {
@@ -17,6 +20,11 @@ public class AlunoService {
     private AlunoRepository alunoRepository;
 
     public Aluno save(Aluno aluno) {
+        if (aluno.getMatricula() == null || aluno.getMatricula().isEmpty()) {
+            String novaMatricula = generateRandomMatricula();
+            aluno.setMatricula(novaMatricula);
+        }
+
         return alunoRepository.save(aluno);
     }
 
@@ -60,11 +68,18 @@ public class AlunoService {
     }
 
     public void delete(Long id) {
-        if(!alunoRepository.existsById(id)){
+        if (!alunoRepository.existsById(id)) {
             throw new EmptyResultDataAccessException(
                     String.format("Nenhum Aluno encontrado com o ID %d", id), 1
             );
         }
         alunoRepository.deleteById(id);
+    }
+
+    public String generateRandomMatricula() {
+        String ano = String.valueOf(Year.now());
+        Random random = new Random();
+        int numAleatorio = random.nextInt(900000) + 100000;
+        return ano + String.valueOf(numAleatorio);
     }
 }

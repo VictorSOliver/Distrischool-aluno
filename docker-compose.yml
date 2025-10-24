@@ -4,9 +4,9 @@ services:
   # 1. SERVIÇO DA API (AlunoService)
   app:
     build: .
-    container_name: distrischool-alunos-api
+    container_name: distrischool-alunos-service
     ports:
-      - "8080:8080"
+      - "8082:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/distrischool_db
       SPRING_DATASOURCE_USERNAME: user

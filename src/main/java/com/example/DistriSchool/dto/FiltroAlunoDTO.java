@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class FiltroAlunoDTO {
     String nome;
-    String matricula;
     String turma;
 }

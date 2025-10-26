@@ -3,12 +3,12 @@ package com.example.DistriSchool.service;
 import com.example.DistriSchool.domain.Aluno;
 import com.example.DistriSchool.dto.FiltroAlunoDTO;
 import com.example.DistriSchool.repository.AlunoRepository;
+import org.springframework.amqp.AmqpException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -19,13 +19,18 @@ public class AlunoService {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    @Autowired
+    private AlunoProducer alunoProducer;
+
     public Aluno save(Aluno aluno) {
         if (aluno.getMatricula() == null || aluno.getMatricula().isEmpty()) {
             String novaMatricula = generateRandomMatricula();
             aluno.setMatricula(novaMatricula);
         }
 
-        return alunoRepository.save(aluno);
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+        alunoProducer.sendMessage(alunoSalvo);
+        return alunoSalvo;
     }
 
     public List<Aluno> getAll() {
@@ -76,7 +81,7 @@ public class AlunoService {
         alunoRepository.deleteById(id);
     }
 
-    public String generateRandomMatricula() {
+    private String generateRandomMatricula() {
         String ano = String.valueOf(Year.now());
         Random random = new Random();
         int numAleatorio = random.nextInt(900000) + 100000;
